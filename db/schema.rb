@@ -10,9 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_25_151439) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_25_152953) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "features", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_features_on_name", unique: true
+  end
 
   create_table "localities", force: :cascade do |t|
     t.string "name"
@@ -20,6 +27,33 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_25_151439) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["state_id"], name: "index_localities_on_state_id"
+  end
+
+  create_table "properties", force: :cascade do |t|
+    t.string "title"
+    t.integer "purpose"
+    t.string "street"
+    t.integer "property_type"
+    t.decimal "price"
+    t.text "description"
+    t.integer "bedrooms"
+    t.integer "bathrooms"
+    t.string "instagram_video_link"
+    t.bigint "user_id", null: false
+    t.bigint "locality_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["locality_id"], name: "index_properties_on_locality_id"
+    t.index ["user_id"], name: "index_properties_on_user_id"
+  end
+
+  create_table "property_features", force: :cascade do |t|
+    t.bigint "property_id", null: false
+    t.bigint "feature_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feature_id"], name: "index_property_features_on_feature_id"
+    t.index ["property_id"], name: "index_property_features_on_property_id"
   end
 
   create_table "states", force: :cascade do |t|
@@ -46,4 +80,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_25_151439) do
   end
 
   add_foreign_key "localities", "states"
+  add_foreign_key "properties", "localities"
+  add_foreign_key "properties", "users"
+  add_foreign_key "property_features", "features"
+  add_foreign_key "property_features", "properties"
 end

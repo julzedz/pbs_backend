@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  purpose: 1
+  street: MyString
+  property_type: 1
+  price: 9.99
+  description: MyText
+  bedrooms: 1
+  bathrooms: 1
+  instagram_video_link: MyString
+  user: one
+  locality: one
+
+two:
+  title: MyString
+  purpose: 1
+  street: MyString
+  property_type: 1
+  price: 9.99
+  description: MyText
+  bedrooms: 1
+  bathrooms: 1
+  instagram_video_link: MyString
+  user: two
+  locality: two
