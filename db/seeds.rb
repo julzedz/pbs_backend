@@ -53,3 +53,4 @@ states_and_lgas.each do |state_name, lgas|
     Locality.find_or_create_by!(name: lga_name, state: state)
   end
 end
+
