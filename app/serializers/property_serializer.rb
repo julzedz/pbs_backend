@@ -2,6 +2,7 @@ class PropertySerializer
   include JSONAPI::Serializer
   attributes :id, :title, :purpose, :street, :property_type, :price, :description, :bedrooms, :bathrooms, :instagram_video_link, :created_at
 
+  belongs_to :user
   belongs_to :locality
   has_many :features
 
