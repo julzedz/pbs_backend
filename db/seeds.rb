@@ -117,3 +117,46 @@ users_data.each_with_index do |user_data, idx|
   property.features << features.sample(2)
 end
 
+# Add a new user with 3 properties for sale
+new_user = User.find_or_create_by!(email: "mary@example.com") do |u|
+  u.first_name = "Mary"
+  u.last_name = "Johnson"
+  u.telephone = "08035551234"
+  u.password = "password"
+  u.password_confirmation = "password"
+end
+
+# Pick 3 different localities and their states
+localities = Locality.limit(3).to_a
+sale_images = [
+  "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80"
+]
+
+3.times do |i|
+  locality = localities[i]
+  state = locality.state
+  property = new_user.properties.create!(
+    title: "Mary's Sale Property #{i+1}",
+    purpose: :sale,
+    street: "#{100 + i} Market Road",
+    property_type: :house,
+    price: 300_000 + i * 100_000,
+    description: "A premium property for sale in #{locality.name}, #{state.name}.",
+    bedrooms: 4 + i,
+    bathrooms: 3 + i,
+    instagram_video_link: "https://www.instagram.com/p/sale#{i}/",
+    locality: locality,
+    state_id: state.id
+  )
+  # Attach a unique online image
+  property.picture.attach(
+    io: URI.open(sale_images[i]),
+    filename: "mary_property#{i+1}.jpg",
+    content_type: "image/jpeg"
+  )
+  # Add features to property
+  property.features << features.sample(2)
+end
+
