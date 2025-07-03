@@ -7,6 +7,8 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+require "open-uri"
+
 states_and_lgas = {
   "Abia" => ["Aba North", "Aba South", "Arochukwu", "Bende", "Ikwuano", "Isiala Ngwa North", "Isiala Ngwa South", "Isuikwuato", "Obi Ngwa", "Ohafia", "Osisioma", "Ugwunagbo", "Ukwa East", "Ukwa West", "Umuahia North", "Umuahia South"],
   "Adamawa" => ["Demsa", "Jada", "Lamurde", "Madagali", "Maiha", "Mayo Belwa", "Michika", "Mubi North", "Mubi South", "Numan", "Shelleng", "Song", "Toungo"],
@@ -52,5 +54,64 @@ states_and_lgas.each do |state_name, lgas|
   lgas.each do |lga_name|
     Locality.find_or_create_by!(name: lga_name, state: state)
   end
+end
+
+# Dummy Features
+feature_names = ["Swimming Pool", "Garden", "Garage", "Borehole", "Security Fence"]
+features = feature_names.map { |name| Feature.find_or_create_by!(name: name) }
+
+# Pick a locality for properties (use the first one for simplicity)
+locality = Locality.first
+
+# Dummy Users and Properties
+users_data = [
+  {
+    first_name: "Jane",
+    last_name: "Doe",
+    email: "jane@example.com",
+    telephone: "08031234567",
+    password: "password"
+  },
+  {
+    first_name: "John",
+    last_name: "Smith",
+    email: "john@example.com",
+    telephone: "08039876543",
+    password: "password"
+  }
+]
+
+users_data.each_with_index do |user_data, idx|
+  user = User.find_or_create_by!(email: user_data[:email]) do |u|
+    u.first_name = user_data[:first_name]
+    u.last_name = user_data[:last_name]
+    u.telephone = user_data[:telephone]
+    u.password = user_data[:password]
+    u.password_confirmation = user_data[:password]
+  end
+
+  property = user.properties.create!(
+    title: "#{user.first_name}'s Modern Home",
+    purpose: :rent,
+    street: "123 Example St",
+    property_type: :house,
+    price: 150_000 + idx * 50_000,
+    description: "A beautiful modern house with great amenities.",
+    bedrooms: 3 + idx,
+    bathrooms: 2 + idx,
+    instagram_video_link: "https://www.instagram.com/p/xyz#{idx}/",
+    locality: locality
+  )
+
+  # Attach an online image
+  image_url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+  property.picture.attach(
+    io: URI.open(image_url),
+    filename: "property#{idx+1}.jpg",
+    content_type: "image/jpeg"
+  )
+
+  # Add features to property
+  property.features << features.sample(2)
 end
 
