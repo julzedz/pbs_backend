@@ -4,6 +4,7 @@ class PropertySerializer
 
   belongs_to :user
   belongs_to :locality
+  belongs_to :state
   has_many :features
 
   attribute :image_url do |property|

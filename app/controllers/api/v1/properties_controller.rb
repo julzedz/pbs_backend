@@ -7,12 +7,12 @@ module Api
       # GET /api/v1/properties
       def index
         @properties = Property.all
-        render json: PropertySerializer.new(@properties, include: [:user, :features, :locality]).serializable_hash
+        render json: PropertySerializer.new(@properties, include: [:user, :features, :state, :locality]).serializable_hash
       end
 
       # GET /api/v1/properties/1
       def show
-        render json: PropertySerializer.new(@property, include: [:user, :features, :locality]).serializable_hash
+        render json: PropertySerializer.new(@property, include: [:user, :features, :state, :locality]).serializable_hash
       end
 
       # POST /api/v1/properties

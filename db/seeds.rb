@@ -62,6 +62,7 @@ features = feature_names.map { |name| Feature.find_or_create_by!(name: name) }
 
 # Pick a locality for properties (use the first one for simplicity)
 locality = Locality.first
+state = locality.state
 
 # Dummy Users and Properties
 users_data = [
@@ -100,7 +101,8 @@ users_data.each_with_index do |user_data, idx|
     bedrooms: 3 + idx,
     bathrooms: 2 + idx,
     instagram_video_link: "https://www.instagram.com/p/xyz#{idx}/",
-    locality: locality
+    locality: locality,
+    state_id: state.id
   )
 
   # Attach an online image
