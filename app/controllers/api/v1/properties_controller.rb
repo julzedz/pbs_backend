@@ -6,7 +6,7 @@ module Api
 
       # GET /api/v1/properties
       def index
-        @properties = Property.all
+        @properties = filter_properties(Property.all)
         render json: PropertySerializer.new(@properties, include: [:user, :features, :state, :locality]).serializable_hash
       end
 
@@ -67,6 +67,28 @@ module Api
           :bedrooms, :bathrooms, :instagram_video_link, :locality_id,
           :picture, feature_ids: []
         )
+      end
+
+      def filter_properties(scope)
+        scope = scope.where(purpose: params[:purpose]) if params[:purpose].present?
+        scope = scope.where(property_type: params[:type]) if params[:type].present?
+        scope = scope.where('bedrooms >= ?', params[:bedrooms]) if params[:bedrooms].present?
+        scope = scope.where('price >= ?', params[:min_price]) if params[:min_price].present?
+        scope = scope.where('price <= ?', params[:max_price]) if params[:max_price].present?
+        scope = scope.where(state_id: params[:state_id]) if params[:state_id].present?
+        scope = scope.where(locality_id: params[:locality_id]) if params[:locality_id].present?
+        if params[:feature_ids].present?
+          Array(params[:feature_ids]).each do |fid|
+            scope = scope.joins(:features).where(features: { id: fid })
+          end
+        end
+        if params[:search].present?
+          q = "%#{params[:search]}%"
+          scope = scope.where(
+            'title ILIKE :q OR description ILIKE :q OR street ILIKE :q', q: q
+          )
+        end
+        scope.distinct
       end
     end
   end
