@@ -129,7 +129,7 @@ end
 # Pick 3 different localities and their states
 localities = Locality.limit(3).to_a
 sale_images = [
-  "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1699435870820-36eab47448f8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGxhemElMjBmb3IlMjBzYWxlfGVufDB8fDB8fHww",
   "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80",
   "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80"
 ]
