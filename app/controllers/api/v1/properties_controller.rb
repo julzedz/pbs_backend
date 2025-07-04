@@ -77,6 +77,7 @@ module Api
         scope = scope.where('price <= ?', params[:max_price]) if params[:max_price].present?
         scope = scope.where(state_id: params[:state_id]) if params[:state_id].present?
         scope = scope.where(locality_id: params[:locality_id]) if params[:locality_id].present?
+        scope = scope.where(user_id: params[:user_id]) if params[:user_id].present?
         if params[:feature_ids].present?
           Array(params[:feature_ids]).each do |fid|
             scope = scope.joins(:features).where(features: { id: fid })
