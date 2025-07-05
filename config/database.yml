@@ -79,6 +79,9 @@ test:
 #
 production:
   <<: *default
+  # Use DATABASE_URL environment variable (preferred for Supabase)
+  url: <%= ENV['DATABASE_URL'] %>
+  # Fallback configuration if DATABASE_URL is not set
   database: pbs_backend_production
   username: pbs_backend
   password: <%= ENV["PBS_BACKEND_DATABASE_PASSWORD"] %>
