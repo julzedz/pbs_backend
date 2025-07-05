@@ -56,9 +56,29 @@ states_and_lgas.each do |state_name, lgas|
   end
 end
 
-# Dummy Features
-feature_names = ["Swimming Pool", "Garden", "Garage", "Borehole", "Security Fence"]
-features = feature_names.map { |name| Feature.find_or_create_by!(name: name) }
+# Features with explicit IDs (matches Supabase table)
+features_with_ids = [
+  [1, "Swimming Pool"],
+  [2, "Garden"],
+  [3, "Garage"],
+  [4, "Borehole"],
+  [5, "Security Fence"],
+  [7, "Boy's Quarters"],
+  [8, "Fast Internet"],
+  [9, "24 Hours Security"],
+  [10, "Children's Playground"],
+  [11, "Big Compound"],
+  [12, "C of O"],
+  [13, "Elevator"],
+  [14, "Free WiFi"],
+  [15, "Church Nearby"],
+  [16, "24 Hours Electricity"],
+  [17, "CCTV Cameras"]
+]
+
+features_with_ids.each do |id, name|
+  Feature.upsert({ id: id, name: name, created_at: Time.now, updated_at: Time.now }, unique_by: :id)
+end
 
 # Pick a locality for properties (use the first one for simplicity)
 locality = Locality.first
