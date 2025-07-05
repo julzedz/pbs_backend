@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: pbs-backend
+    env: ruby
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pbs-backend-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: RAILS_SERVE_STATIC_FILES
+        value: true
+      - key: RENDER_EXTERNAL_HOSTNAME
+        value: pbs-backend.onrender.com
+
+databases:
+  - name: pbs-backend-db
+    databaseName: pbs_backend_production
+    user: pbs_backend
