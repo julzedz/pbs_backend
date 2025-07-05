@@ -80,6 +80,9 @@ features_with_ids.each do |id, name|
   Feature.upsert({ id: id, name: name, created_at: Time.now, updated_at: Time.now }, unique_by: :id)
 end
 
+# Add this line to define 'features' for later use
+features = Feature.where(id: features_with_ids.map(&:first)).to_a
+
 # Pick a locality for properties (use the first one for simplicity)
 locality = Locality.first
 state = locality.state
