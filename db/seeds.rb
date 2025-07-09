@@ -114,30 +114,35 @@ users_data.each_with_index do |user_data, idx|
     u.password_confirmation = user_data[:password]
   end
 
-  property = user.properties.create!(
+  property = user.properties.find_or_create_by!(
     title: "#{user.first_name}'s Modern Home",
-    purpose: :rent,
-    street: "123 Example St",
-    property_type: :house,
-    price: 150_000 + idx * 50_000,
-    description: "A beautiful modern house with great amenities.",
-    bedrooms: 3 + idx,
-    bathrooms: 2 + idx,
-    instagram_video_link: "https://www.instagram.com/p/xyz#{idx}/",
-    locality: locality,
-    state_id: state.id
-  )
+    street: "123 Example St"
+  ) do |p|
+    p.purpose = :rent
+    p.property_type = :house
+    p.price = 150_000 + idx * 50_000
+    p.description = "A beautiful modern house with great amenities."
+    p.bedrooms = 3 + idx
+    p.bathrooms = 2 + idx
+    p.instagram_video_link = "https://www.instagram.com/p/xyz#{idx}/"
+    p.locality = locality
+    p.state_id = state.id
+  end
 
-  # Attach an online image
-  image_url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
-  property.picture.attach(
-    io: URI.open(image_url),
-    filename: "property#{idx+1}.jpg",
-    content_type: "image/jpeg"
-  )
+  # Attach an online image if not already attached
+  unless property.picture.attached?
+    image_url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+    property.picture.attach(
+      io: URI.open(image_url),
+      filename: "property#{idx+1}.jpg",
+      content_type: "image/jpeg"
+    )
+  end
 
-  # Add features to property
-  property.features << features.sample(2)
+  # Add features to property if not already present
+  if property.features.empty?
+    property.features << features.sample(2)
+  end
 end
 
 # Add a new user with 3 properties for sale
@@ -160,26 +165,31 @@ sale_images = [
 3.times do |i|
   locality = localities[i]
   state = locality.state
-  property = new_user.properties.create!(
+  property = new_user.properties.find_or_create_by!(
     title: "Mary's Sale Property #{i+1}",
-    purpose: :sale,
-    street: "#{100 + i} Market Road",
-    property_type: :house,
-    price: 300_000 + i * 100_000,
-    description: "A premium property for sale in #{locality.name}, #{state.name}.",
-    bedrooms: 4 + i,
-    bathrooms: 3 + i,
-    instagram_video_link: "https://www.instagram.com/p/sale#{i}/",
-    locality: locality,
-    state_id: state.id
-  )
-  # Attach a unique online image
-  property.picture.attach(
-    io: URI.open(sale_images[i]),
-    filename: "mary_property#{i+1}.jpg",
-    content_type: "image/jpeg"
-  )
-  # Add features to property
-  property.features << features.sample(2)
+    street: "#{100 + i} Market Road"
+  ) do |p|
+    p.purpose = :sale
+    p.property_type = :house
+    p.price = 300_000 + i * 100_000
+    p.description = "A premium property for sale in #{locality.name}, #{state.name}."
+    p.bedrooms = 4 + i
+    p.bathrooms = 3 + i
+    p.instagram_video_link = "https://www.instagram.com/p/sale#{i}/"
+    p.locality = locality
+    p.state_id = state.id
+  end
+  # Attach a unique online image if not already attached
+  unless property.picture.attached?
+    property.picture.attach(
+      io: URI.open(sale_images[i]),
+      filename: "mary_property#{i+1}.jpg",
+      content_type: "image/jpeg"
+    )
+  end
+  # Add features to property if not already present
+  if property.features.empty?
+    property.features << features.sample(2)
+  end
 end
 

@@ -4,7 +4,7 @@ class Property < ApplicationRecord
   belongs_to :user
   belongs_to :locality
   belongs_to :state
-  has_one_attached :picture
+  has_one_attached :picture, dependent: :purge_later
   has_many :property_features, dependent: :destroy
   has_many :features, through: :property_features
 end
