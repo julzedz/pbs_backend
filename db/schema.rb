@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_03_150015) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_28_185910) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -72,6 +72,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_03_150015) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "state_id"
+    t.string "contact_name"
+    t.string "contact_number"
     t.index ["locality_id"], name: "index_properties_on_locality_id"
     t.index ["state_id"], name: "index_properties_on_state_id"
     t.index ["user_id"], name: "index_properties_on_user_id"
