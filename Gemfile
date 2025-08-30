@@ -39,8 +39,10 @@ gem "devise-jwt"
 gem "jsonapi-serializer"
 gem "aws-sdk-s3", "~> 1.0"
 gem "activeadmin"
-# Sass is needed for ActiveAdmin's stylesheets
-gem 'sass-rails'
+# Required for ActiveAdmin/InheritedResources responders
+gem "responders"
+# Use SassC pipeline for Sprockets with ActiveAdmin
+gem "sassc-rails"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
