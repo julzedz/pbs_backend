@@ -8,6 +8,6 @@ class PropertySerializer
   has_many :features
 
   attribute :image_url do |property|
-    Rails.application.routes.url_helpers.rails_blob_url(property.picture) if property.picture.attached?
+    property.picture.url if property.picture.attached?
   end
 end 
