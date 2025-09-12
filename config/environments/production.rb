@@ -78,6 +78,10 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
+  config.hosts << "property-busstop.onrender.com"
+  config.hosts << "server2025.propertybusstop.com"
+  config.hosts << "propertybusstop.com"
+
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
