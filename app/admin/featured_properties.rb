@@ -1,4 +1,6 @@
 ActiveAdmin.register FeaturedProperty do
+  permit_params property_ids: []
+
   controller do
     before_action only: [:new, :create] do
       if FeaturedProperty.any?
@@ -10,7 +12,6 @@ ActiveAdmin.register FeaturedProperty do
       FeaturedProperty.first_or_create
     end
 
-    permit_params property_ids: []
   end
 
   form do |f|
