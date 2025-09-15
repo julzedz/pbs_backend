@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       resources :features, only: [:index, :create]
       resources :localities, only: [:index, :create]
       resources :states, only: [:index, :create]
+      resources :featured_properties, only: [:index]
     end
   end
 end
