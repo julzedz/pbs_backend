@@ -8,6 +8,7 @@ image: julzedz/pbs_backend
 servers:
   web:
     - server2025.propertybusstop.com
+    - localhost
   # job:
   #   hosts:
   #     - 192.168.0.1
