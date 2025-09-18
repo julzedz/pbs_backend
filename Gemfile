@@ -44,7 +44,6 @@ gem "responders"
 # Use SassC pipeline for Sprockets with ActiveAdmin
 gem "sassc-rails"
 # gem "dotenv-rails"
-gem 'kamal'
 
 
 group :development, :test do
