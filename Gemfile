@@ -43,7 +43,7 @@ gem "activeadmin"
 gem "responders"
 # Use SassC pipeline for Sprockets with ActiveAdmin
 gem "sassc-rails"
-gem "dotenv-rails"
+# gem "dotenv-rails"
 gem 'kamal'
 
 
