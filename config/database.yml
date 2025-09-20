@@ -79,14 +79,10 @@ test:
 #
 production:
   # Use DATABASE_URL environment variable (preferred for Supabase)
-  adapter: postgresql
-  encoding: unicode
-  host: aws-0-us-east-2.pooler.supabase.com
-  port: 6543
-  database: postgres
-  username: postgres.jxuhrcgwhvobeusmjjls
-  password: xyrPef-hovrab-6muxni
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  sslmode: require
+  timeout: 9000
+  prepared_statements: false
   # Fallback configuration if DATABASE_URL is not set
 
