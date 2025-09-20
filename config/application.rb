@@ -31,8 +31,8 @@ module PbsBackend
     config.autoload_paths << Rails.root.join('app/serializers')
  
 
-  if Rails.env.production?
-  config.secret_key_base = ENV.fetch('SECRET_KEY_BASE')
+    if Rails.env.production?
+      config.secret_key_base = ENV.fetch('SECRET_KEY_BASE')
+    end
   end
-end
 end
