@@ -29,5 +29,10 @@ module PbsBackend
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = false
     config.autoload_paths << Rails.root.join('app/serializers')
+ 
+
+  if Rails.env.production?
+  config.secret_key_base = ENV.fetch('SECRET_KEY_BASE') { 'ee319926ecc0500b94f1f65b95014bce563c1b907f50502c6acdc33f5b57fece3e787efcd7df8298b0a74e2018be26dcd4ca9adfb6a28019062fe7f6bf86558d' }
   end
+end
 end

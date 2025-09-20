@@ -82,6 +82,8 @@ Rails.application.configure do
   config.hosts << "server2025.propertybusstop.com"
   config.hosts << "propertybusstop.com"
 
+
+  config.secret_key_base = 'ee319926ecc0500b94f1f65b95014bce563c1b907f50502c6acdc33f5b57fece3e787efcd7df8298b0a74e2018be26dcd4ca9adfb6a28019062fe7f6bf86558d'
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
