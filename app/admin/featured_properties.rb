@@ -21,16 +21,33 @@ ActiveAdmin.register FeaturedProperty do
 
       # This is the list of properties that are currently featured.
       div id: 'selected_properties_list', class: 'border-2 border-dashed border-gray-300 p-4 rounded-lg' do
-        if f.object.property_ids.present?
-          Property.where(id: f.object.property_ids).each do |property|
-            span class: 'property-tag inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full' do
-              text_node "#{property.title} (ID: #{property.id})"
+      if f.object.property_ids.present?
+        table do
+          thead do
+            tr do
+              th "Title"
+              th "ID"
+              th "Price"
+              th "Purpose"
+              th "Type"
             end
           end
-        else
-          text_node 'No featured properties selected.'
+          tbody do
+            Property.where(id: f.object.property_ids).each do |property|
+              tr do
+                td property.title
+                td property.id
+                td number_to_currency(property.price)
+                td property.purpose
+                td property.property_type
+              end
+            end
+          end
         end
+      else
+        text_node 'No featured properties selected.'
       end
+    end
     end
 
     f.actions
