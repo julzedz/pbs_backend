@@ -193,7 +193,7 @@ sale_images = [
   end
 end
 
-# Create a default AdminUser if one doesn't exist
+# Create a default AdminUser 
 if Rails.env.production?
   admin_email = ENV['ADMIN_EMAIL']
   admin_password = ENV['ADMIN_PASSWORD']
@@ -206,3 +206,5 @@ end
 
 puts "Created AdminUser with email: #{admin_email}"
 
+first_property_id = Property.first&.id
+FeaturedProperty.first_or_create(property_ids: first_property_id ? [first_property_id] : [0])
