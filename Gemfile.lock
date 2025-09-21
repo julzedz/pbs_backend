@@ -293,6 +293,7 @@ GEM
       sprockets-rails
       tilt
     securerandom (0.4.1)
+    select2-rails (4.0.13)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -338,6 +339,7 @@ DEPENDENCIES
   rails (~> 7.1.2)
   responders
   sassc-rails
+  select2-rails
   tzinfo-data
 
 RUBY VERSION

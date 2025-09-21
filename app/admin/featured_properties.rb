@@ -17,7 +17,11 @@ ActiveAdmin.register FeaturedProperty do
 
   form do |f|
     f.inputs do
-      f.input :property_ids, as: :check_boxes, collection: Property.all.map { |p| [p.title, p.id] }
+      f.input :property_ids,
+      as: :select,
+      multiple: true,
+      collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
+      input_html: { class: "select2" }
 
       # This is the list of properties that are currently featured.
       div id: 'selected_properties_list', class: 'border-2 border-dashed border-gray-300 p-4 rounded-lg' do
