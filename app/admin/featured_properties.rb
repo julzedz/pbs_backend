@@ -13,45 +13,38 @@ ActiveAdmin.register FeaturedProperty do
       FeaturedProperty.first_or_create
     end
 
-    def add_property
-      featured = FeaturedProperty.first_or_create
-      property_id = params[:property_id]
-      
-      if property_id.present? && !featured.property_ids.include?(property_id.to_i)
-        featured.property_ids << property_id.to_i
-        featured.save
-        flash[:notice] = "Property added to featured list"
-      elsif featured.property_ids.include?(property_id.to_i)
-        flash[:alert] = "Property is already featured"
-      else
-        flash[:alert] = "Invalid property"
-      end
-      
-      redirect_to edit_admin_featured_property_path(featured)
-    end
-
-    def remove_property
-      featured = FeaturedProperty.first_or_create
-      property_id = params[:property_id]
-      
-      if property_id.present? && featured.property_ids.include?(property_id.to_i)
-        featured.property_ids.delete(property_id.to_i)
-        featured.save
-        flash[:notice] = "Property removed from featured list"
-      else
-        flash[:alert] = "Property not found in featured list"
-      end
-      
-      redirect_to edit_admin_featured_property_path(featured)
-    end
   end
 
   member_action :add_property, method: :post do
-    add_property
+    featured = FeaturedProperty.first_or_create
+    property_id = params[:property_id]
+    
+    if property_id.present? && !featured.property_ids.include?(property_id.to_i)
+      featured.property_ids << property_id.to_i
+      featured.save
+      flash[:notice] = "Property added to featured list"
+    elsif featured.property_ids.include?(property_id.to_i)
+      flash[:alert] = "Property is already featured"
+    else
+      flash[:alert] = "Invalid property"
+    end
+    
+    redirect_to edit_admin_featured_property_path(featured)
   end
 
   member_action :remove_property, method: :delete do
-    remove_property
+    featured = FeaturedProperty.first_or_create
+    property_id = params[:property_id]
+    
+    if property_id.present? && featured.property_ids.include?(property_id.to_i)
+      featured.property_ids.delete(property_id.to_i)
+      featured.save
+      flash[:notice] = "Property removed from featured list"
+    else
+      flash[:alert] = "Property not found in featured list"
+    end
+    
+    redirect_to edit_admin_featured_property_path(featured)
   end
 
   form do |f|
@@ -64,7 +57,7 @@ ActiveAdmin.register FeaturedProperty do
                      :id, 
                      :title
                    ),
-                   { prompt: "Choose a property to add", class: "select2" }
+                   { prompt: "Choose a property to add", class: "select2", id: "new_property_id" }
         
         div do
           link_to "Add Property", 
@@ -136,8 +129,10 @@ ActiveAdmin.register FeaturedProperty do
                           remove_property_admin_featured_property_path(f.object, property_id: property.id), 
                           method: :delete,
                           class: "button",
-                          confirm: "Remove this property from featured list?",
-                          style: "background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;"
+                          style: "background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;",
+                          data: { 
+                            confirm: "Remove this property from featured list?" 
+                          }
                 end
               end
             end
