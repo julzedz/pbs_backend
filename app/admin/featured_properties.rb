@@ -17,6 +17,11 @@ ActiveAdmin.register FeaturedProperty do
 
   member_action :add_property, method: :post do
     featured = FeaturedProperty.first_or_create
+    
+    # Clean up property_ids to remove empty strings and convert to integers
+    featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
+    featured.save
+    
     property_id = params[:property_id].to_i
     
     Rails.logger.info "=== ADD DEBUG ==="
@@ -39,6 +44,11 @@ ActiveAdmin.register FeaturedProperty do
 
   member_action :remove_property, method: :delete do
     featured = FeaturedProperty.first_or_create
+    
+    # Clean up property_ids to remove empty strings and convert to integers
+    featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
+    featured.save
+    
     property_id = params[:property_id].to_i
     
     Rails.logger.info "=== REMOVE DEBUG ==="
@@ -63,21 +73,21 @@ ActiveAdmin.register FeaturedProperty do
         label "Select Property to Add"
         
         # Show available properties for debugging
-        div style: "margin-bottom: 10px;" do
+        div style: "margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;" do
           text_node "Available properties: #{Property.count}"
           br
-          text_node "Featured properties: #{f.object.property_ids.count}"
+          text_node "Featured properties: #{f.object.property_ids.reject(&:blank?).count}"
           br
-          text_node "Featured IDs: #{f.object.property_ids.join(', ')}"
+          text_node "Featured IDs: #{f.object.property_ids.reject(&:blank?).join(', ')}"
         end
         
         select_tag :new_property_id, 
-                   options_from_collection_for_select(
-                     Property.all, 
-                     :id, 
-                     :title
-                   ),
-                   { prompt: "Choose a property to add", class: "select2", id: "new_property_id" }
+                  options_from_collection_for_select(
+                    Property.all, 
+                    :id, 
+                    :title
+                  ),
+                  { prompt: "Choose a property to add", class: "select2", id: "new_property_id", style: "width: 100%; margin-top: 10px;" }
         
         div do
           link_to "Add Property", 
@@ -124,7 +134,7 @@ ActiveAdmin.register FeaturedProperty do
     end
 
     f.inputs "Currently Featured Properties" do
-      if f.object.property_ids.present?
+      if f.object.property_ids.reject(&:blank?).present?
         table class: 'index_table' do
           thead do
             tr do
@@ -137,7 +147,7 @@ ActiveAdmin.register FeaturedProperty do
             end
           end
           tbody do
-            Property.where(id: f.object.property_ids).each do |property|
+            Property.where(id: f.object.property_ids.reject(&:blank?).map(&:to_i)).each do |property|
               tr do
                 td property.title
                 td property.id
