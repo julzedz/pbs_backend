@@ -63,7 +63,7 @@ ActiveAdmin.register FeaturedProperty do
               multiple: true,
               collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
               input_html: { class: "select2" },
-              hint: "Select multiple properties to feature. Use Ctrl+Click (or Cmd+Click on Mac) to select multiple properties."
+              hint: "To select multiple properties, use Ctrl+Click (or Cmd+Click on Mac)."
       
       div do
         link_to "Add to Featured List", 
@@ -73,56 +73,6 @@ ActiveAdmin.register FeaturedProperty do
       end
     end
     
-    javascript_tag do
-      <<~JS
-        function addSelectedPropertiesToFeatured() {
-          const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
-          const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
-          
-          if (selectedValues.length === 0) {
-            alert('Please select at least one property first');
-            return;
-          }
-          
-          if (confirm('Add selected properties to featured list?')) {
-            // Submit the form with selected properties
-            const form = document.querySelector('form');
-            form.submit();
-          }
-        }
-        
-        function addPropertyToFeatured() {
-          const selectElement = document.getElementById('new_property_id');
-          const propertyId = selectElement.value;
-          
-          if (!propertyId) {
-            alert('Please select a property first');
-            return;
-          }
-          
-          if (confirm('Add this property to featured list?')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '#{add_property_admin_featured_property_path(f.object)}?property_id=' + propertyId;
-            
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'POST';
-            form.appendChild(methodInput);
-            
-            const tokenInput = document.createElement('input');
-            tokenInput.type = 'hidden';
-            tokenInput.name = 'authenticity_token';
-            tokenInput.value = document.querySelector('meta[name="csrf-token"]').content;
-            form.appendChild(tokenInput);
-            
-            document.body.appendChild(form);
-            form.submit();
-          }
-        }
-      JS
-    end
   
     f.inputs "Currently Featured Properties" do
       if f.object.property_ids.reject(&:blank?).present?
@@ -186,5 +136,26 @@ ActiveAdmin.register FeaturedProperty do
         end
       end
     end
+  end
+
+  # JavaScript function outside form block
+  javascript_tag do
+    <<~JS
+      function addSelectedPropertiesToFeatured() {
+        const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
+        const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+        
+        if (selectedValues.length === 0) {
+          alert('Please select at least one property first');
+          return;
+        }
+        
+        if (confirm('Add selected properties to featured list?')) {
+          // Submit the form with selected properties
+          const form = document.querySelector('form');
+          form.submit();
+        }
+      }
+    JS
   end
 end
