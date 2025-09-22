@@ -71,6 +71,26 @@ ActiveAdmin.register FeaturedProperty do
                 class: "button add-property-btn",
                 onclick: "addSelectedPropertiesToFeatured()"
       end
+      
+      script do
+        <<~JS.html_safe
+          function addSelectedPropertiesToFeatured() {
+            const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
+            const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+            
+            if (selectedValues.length === 0) {
+              alert('Please select at least one property first');
+              return;
+            }
+            
+            if (confirm('Add selected properties to featured list?')) {
+              // Submit the form with selected properties
+              const form = document.querySelector('form');
+              form.submit();
+            }
+          }
+        JS
+      end
     end
     
   
@@ -138,24 +158,4 @@ ActiveAdmin.register FeaturedProperty do
     end
   end
 
-  # JavaScript function outside form block
-  javascript_tag do
-    <<~JS
-      function addSelectedPropertiesToFeatured() {
-        const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
-        const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
-        
-        if (selectedValues.length === 0) {
-          alert('Please select at least one property first');
-          return;
-        }
-        
-        if (confirm('Add selected properties to featured list?')) {
-          // Submit the form with selected properties
-          const form = document.querySelector('form');
-          form.submit();
-        }
-      }
-    JS
-  end
 end
