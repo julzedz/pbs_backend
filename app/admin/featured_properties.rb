@@ -82,7 +82,7 @@ ActiveAdmin.register FeaturedProperty do
               multiple: true,
               collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
               input_html: { class: "select2" },
-              hint: "Select one or more properties. The selection will be added to the current list upon submission."
+              hint: "To select multiple properties, use Ctrl+Click (or Cmd+Click on Mac)."
       
       # The custom JavaScript button that submits the main form.
       div do
