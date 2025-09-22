@@ -16,13 +16,13 @@ ActiveAdmin.register FeaturedProperty do
 
   member_action :add_property, method: :post do
     featured = FeaturedProperty.first_or_create
-    
+
     # Clean up property_ids to remove empty strings and convert to integers
     featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
     featured.save
-    
+
     property_id = params[:property_id].to_i
-    
+
     if property_id.present? && !featured.property_ids.include?(property_id)
       featured.property_ids << property_id
       featured.save
@@ -32,19 +32,19 @@ ActiveAdmin.register FeaturedProperty do
     else
       flash[:alert] = "Invalid property ID: #{property_id}"
     end
-    
+
     redirect_to edit_admin_featured_property_path(featured)
   end
 
   member_action :remove_property, method: :delete do
     featured = FeaturedProperty.first_or_create
-    
+
     # Clean up property_ids to remove empty strings and convert to integers
     featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
     featured.save
-    
+
     property_id = params[:property_id].to_i
-    
+
     if property_id.present? && featured.property_ids.include?(property_id)
       featured.property_ids.delete(property_id)
       featured.save
@@ -52,67 +52,55 @@ ActiveAdmin.register FeaturedProperty do
     else
       flash[:alert] = "Property #{property_id} not found in featured list. Current IDs: #{featured.property_ids.join(', ')}"
     end
-    
+
     redirect_to edit_admin_featured_property_path(featured)
-  end
+  end # Missing end keyword was here.
 
   form do |f|
     f.inputs "Add New Property to Featured List" do
-      div class: 'field' do
-        label "Select Property to Add"
-        
-        select_tag :new_property_id, 
-                   options_from_collection_for_select(
-                     Property.all, 
-                     :id, 
-                     :title
-                   ),
-                   { prompt: "Choose a property to add", class: "select2", id: "new_property_id", style: "width: 100%; margin-top: 10px;" }
-        
-        div do
-          link_to "Add Property", 
-                  "#", 
-                  class: "button add-property-btn",
-                  onclick: "addPropertyToFeatured()"
-        end
-        
-        javascript_tag do
-          <<~JS
-            function addPropertyToFeatured() {
-              const selectElement = document.getElementById('new_property_id');
-              const propertyId = selectElement.value;
-              
-              if (!propertyId) {
-                alert('Please select a property first');
-                return;
-              }
-              
-              if (confirm('Add this property to featured list?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '#{add_property_admin_featured_property_path(f.object)}?property_id=' + propertyId;
-                
-                const methodInput = document.createElement('input');
-                methodInput.type = 'hidden';
-                methodInput.name = '_method';
-                methodInput.value = 'POST';
-                form.appendChild(methodInput);
-                
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = 'authenticity_token';
-                tokenInput.value = document.querySelector('meta[name="csrf-token"]').content;
-                form.appendChild(tokenInput);
-                
-                document.body.appendChild(form);
-                form.submit();
-              }
-            }
-          JS
-        end
-      end
+      f.input :property_ids,
+              as: :select,
+              multiple: true,
+              collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
+              input_html: { class: "select2" },
+              hint: "Select multiple properties to feature. Use Ctrl+Click (or Cmd+Click on Mac) to select multiple properties."
     end
-
+    
+    javascript_tag do
+      <<~JS
+        function addPropertyToFeatured() {
+          const selectElement = document.getElementById('new_property_id');
+          const propertyId = selectElement.value;
+          
+          if (!propertyId) {
+            alert('Please select a property first');
+            return;
+          }
+          
+          if (confirm('Add this property to featured list?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '#{add_property_admin_featured_property_path(f.object)}?property_id=' + propertyId;
+            
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'POST';
+            form.appendChild(methodInput);
+            
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'authenticity_token';
+            tokenInput.value = document.querySelector('meta[name="csrf-token"]').content;
+            form.appendChild(tokenInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+          }
+        }
+      JS
+    end
+  
     f.inputs "Currently Featured Properties" do
       if f.object.property_ids.reject(&:blank?).present?
         table class: 'index_table' do
