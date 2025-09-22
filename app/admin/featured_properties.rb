@@ -1,8 +1,11 @@
 ActiveAdmin.register FeaturedProperty do
+  # --- CONFIGURATION ---
   actions :all, except: [:new, :destroy]
-
   permit_params property_ids: []
 
+  # --- CONTROLLER LOGIC ---
+  # Overriding controller actions to handle this singleton resource
+  # and correctly merge property IDs on update.
   controller do
     def index
       featured = FeaturedProperty.first_or_create
@@ -12,15 +15,33 @@ ActiveAdmin.register FeaturedProperty do
     def find_resource
       FeaturedProperty.first_or_create
     end
+
+    def update
+      featured = find_resource
+
+      # Sanitize and load existing property IDs
+      existing_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
+
+      # Sanitize and load newly selected property IDs from the form
+      newly_selected_ids = params.dig(:featured_property, :property_ids)&.reject(&:blank?)&.map(&:to_i) || []
+
+      # Merge existing and new IDs, ensuring uniqueness
+      updated_ids = (existing_ids + newly_selected_ids).uniq
+
+      if featured.update(property_ids: updated_ids)
+        flash[:notice] = "Featured properties were successfully updated."
+      else
+        flash[:alert] = "Failed to update featured properties: #{featured.errors.full_messages.join(', ')}"
+      end
+      redirect_to edit_admin_featured_property_path(featured)
+    end
   end
 
+  # --- CUSTOM MEMBER ACTIONS ---
+  # This action is not used by your form but kept as is.
   member_action :add_property, method: :post do
     featured = FeaturedProperty.first_or_create
-
-    # Clean up property_ids to remove empty strings and convert to integers
     featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
-    featured.save
-
     property_id = params[:property_id].to_i
 
     if property_id.present? && !featured.property_ids.include?(property_id)
@@ -32,17 +53,13 @@ ActiveAdmin.register FeaturedProperty do
     else
       flash[:alert] = "Invalid property ID: #{property_id}"
     end
-
     redirect_to edit_admin_featured_property_path(featured)
   end
 
+  # Your working remove action - unchanged
   member_action :remove_property, method: :delete do
     featured = FeaturedProperty.first_or_create
-
-    # Clean up property_ids to remove empty strings and convert to integers
     featured.property_ids = featured.property_ids.reject(&:blank?).map(&:to_i)
-    featured.save
-
     property_id = params[:property_id].to_i
 
     if property_id.present? && featured.property_ids.include?(property_id)
@@ -50,112 +67,98 @@ ActiveAdmin.register FeaturedProperty do
       featured.save
       flash[:notice] = "Property #{property_id} removed from featured list"
     else
-      flash[:alert] = "Property #{property_id} not found in featured list. Current IDs: #{featured.property_ids.join(', ')}"
+      flash[:alert] = "Property #{property_id} not found in featured list."
     end
-
     redirect_to edit_admin_featured_property_path(featured)
-  end # Missing end keyword was here.
+  end
 
+  # --- FORM DEFINITION ---
   form do |f|
     f.inputs "Add New Property to Featured List" do
+      # This select input allows users to choose new properties to add.
       f.input :property_ids,
+              label: "Select Properties to Add",
               as: :select,
               multiple: true,
               collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
               input_html: { class: "select2" },
-              hint: "To select multiple properties, use Ctrl+Click (or Cmd+Click on Mac)."
+              hint: "Select one or more properties. The selection will be added to the current list upon submission."
       
+      # The custom JavaScript button that submits the main form.
       div do
-        link_to "Add to Featured List", 
-                "#", 
-                class: "button add-property-btn",
-                onclick: "addSelectedPropertiesToFeatured()"
+        f.button "Add Selected to Featured List", type: 'button', onclick: "addSelectedPropertiesToFeatured()", class: "add-property-btn"
       end
       
       script do
         <<~JS.html_safe
           function addSelectedPropertiesToFeatured() {
             const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
-            const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
-            
-            if (selectedValues.length === 0) {
-              alert('Please select at least one property first');
+            if (selectElement.selectedOptions.length === 0) {
+              alert('Please select at least one property to add.');
               return;
             }
-            
-            if (confirm('Add selected properties to featured list?')) {
-              // Submit the form with selected properties
-              const form = document.querySelector('form');
-              form.submit();
+            if (confirm('Add the selected properties to the featured list?')) {
+              // Submit the main form to trigger the custom 'update' action
+              document.querySelector('form.formtastic').submit();
             }
           }
         JS
       end
     end
     
-  
+    # This section displays the properties that are currently featured.
     f.inputs "Currently Featured Properties" do
-      if f.object.property_ids.reject(&:blank?).present?
-        table class: 'index_table' do
-          thead do
-            tr do
-              th "Title"
-              th "ID"
-              th "Price"
-              th "Purpose"
-              th "Type"
-              th "Actions"
-            end
+      featured_properties = Property.where(id: f.object.property_ids.reject(&:blank?).map(&:to_i))
+      
+      if featured_properties.present?
+        table_for featured_properties, class: 'index_table' do
+          column "Title", :title
+          column "ID", :id
+          column "Price" do |property|
+            number_to_currency(property.price)
           end
-          tbody do
-            Property.where(id: f.object.property_ids.reject(&:blank?).map(&:to_i)).each do |property|
-              tr do
-                td property.title
-                td property.id
-                td number_to_currency(property.price)
-                td property.purpose.humanize
-                td property.property_type.humanize
-                td do
-                  link_to "Remove", 
-                          remove_property_admin_featured_property_path(f.object, property_id: property.id), 
-                          method: :delete,
-                          class: "button",
-                          style: "background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;",
-                          data: { 
-                            confirm: "Remove this property from featured list?" 
-                          }
-                end
-              end
-            end
+          column "Purpose" do |property|
+            property.purpose.humanize
+          end
+          column "Type" do |property|
+            property.property_type.humanize
+          end
+          column "Actions" do |property|
+            link_to "Remove", 
+                    remove_property_admin_featured_property_path(f.object, property_id: property.id), 
+                    method: :delete,
+                    class: "button",
+                    style: "background-color: #dc3545; color: white;",
+                    data: { confirm: "Are you sure you want to remove this property?" }
           end
         end
       else
         div class: 'no-content' do
-          text_node 'No featured properties selected.'
+          text_node 'No featured properties have been selected yet.'
         end
       end
     end
-
-    # Hidden field to maintain the current property_ids
-    f.input :property_ids, as: :hidden, value: f.object.property_ids.join(',')
-
-    f.actions
+    
+    # We no longer need the hidden field here.
+    # The standard actions block is also omitted to avoid confusion with the custom "Add" button.
+    # f.actions
   end
 
+  # --- SHOW PAGE DEFINITION ---
   show do
     attributes_table do
       row "Featured Properties" do |featured|
-        if featured.property_ids.present? && featured.property_ids.reject(&:blank?).present?
+        properties = Property.where(id: featured.property_ids.reject(&:blank?).map(&:to_i))
+        if properties.present?
           ul do
-            Property.where(id: featured.property_ids.reject(&:blank?).map(&:to_i)).each do |property|
-              li "#{property.title} (ID: #{property.id}) - #{number_to_currency(property.price)}"
+            properties.each do |property|
+              li link_to("#{property.title} (ID: #{property.id})", admin_property_path(property))
             end
           end
         else
-          "No featured properties"
+          "No featured properties."
         end
       end
     end
   end
-
 end
