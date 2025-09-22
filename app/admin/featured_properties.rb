@@ -64,10 +64,33 @@ ActiveAdmin.register FeaturedProperty do
               collection: Property.all.map { |p| ["#{p.title} (ID: #{p.id})", p.id] },
               input_html: { class: "select2" },
               hint: "Select multiple properties to feature. Use Ctrl+Click (or Cmd+Click on Mac) to select multiple properties."
+      
+      div do
+        link_to "Add to Featured List", 
+                "#", 
+                class: "button add-property-btn",
+                onclick: "addSelectedPropertiesToFeatured()"
+      end
     end
     
     javascript_tag do
       <<~JS
+        function addSelectedPropertiesToFeatured() {
+          const selectElement = document.querySelector('select[name="featured_property[property_ids][]"]');
+          const selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+          
+          if (selectedValues.length === 0) {
+            alert('Please select at least one property first');
+            return;
+          }
+          
+          if (confirm('Add selected properties to featured list?')) {
+            // Submit the form with selected properties
+            const form = document.querySelector('form');
+            form.submit();
+          }
+        }
+        
         function addPropertyToFeatured() {
           const selectElement = document.getElementById('new_property_id');
           const propertyId = selectElement.value;
