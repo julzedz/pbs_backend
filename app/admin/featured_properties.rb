@@ -115,7 +115,7 @@ ActiveAdmin.register FeaturedProperty do
           column "Title", :title
           column "ID", :id
           column "Price" do |property|
-            number_to_currency(property.price)
+            number_to_currency(property.price, unit: "₦")
           end
           column "Purpose" do |property|
             property.purpose.humanize

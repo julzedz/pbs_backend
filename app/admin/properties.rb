@@ -1,5 +1,6 @@
 ActiveAdmin.register Property do
   filter :title
+  filter :id
   filter :purpose
   filter :street
   filter :property_type
@@ -15,7 +16,28 @@ ActiveAdmin.register Property do
   filter :contact_phone
   filter :created_at
   # filter :updated_at
-  
+
+  index do
+    selectable_column
+    id_column
+    column :title
+    column :purpose
+    column :street
+    column :property_type
+    column :bedrooms
+    column :bathrooms
+    column :locality
+    column :state
+    column :contact_name
+    column :contact_phone
+    column :user
+    column :created_at
+    column "Price" do |property|
+      number_to_currency(property.price, unit: "₦")
+    end
+    actions
+  end
+
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
