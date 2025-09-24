@@ -6,7 +6,10 @@ module Api
 
       # GET /api/v1/properties
       def index
-        @properties = filter_properties(Property.all)
+        @properties = filter_properties(Property.includes(:user, :features, :state, :locality))
+        page = params[:page].to_i > 0 ? params[:page].to_i : 1
+        per_page = 20
+        @properties = @properties.offset((page - 1) * per_page).limit(per_page)
         render json: PropertySerializer.new(@properties, include: [:user, :features, :state, :locality]).serializable_hash
       end
 
