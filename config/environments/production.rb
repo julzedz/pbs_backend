@@ -14,6 +14,10 @@ Rails.application.configure do
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local = false
+ # temporarily allow requests from any host so Rails won’t block valid requests
+  # allow the app hostname in production
+ config.hosts << 'server2025.propertybusstop.com'
+ config.hosts << '102.212.246.204'
 
   # Ensures that a master key has been made available in ENV["RAILS_MASTER_KEY"], config/master.key, or an environment
   # key such as config/credentials/production.key. This key is used to decrypt credentials (and other encrypted files).
