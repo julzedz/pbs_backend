@@ -18,6 +18,16 @@ module Api
         render json: PropertySerializer.new(@property, include: [:user, :features, :state, :locality]).serializable_hash
       end
 
+      # GET /api/v1/properties/count
+      def count
+        if params[:user_id].present?
+          count = Property.where(user_id: params[:user_id]).count
+          render json: { count: count }
+        else
+          render json: { error: "user_id parameter is required" }, status: :bad_request
+        end
+      end
+
       # POST /api/v1/properties
       def create
         @property = current_user.properties.build(property_params)
