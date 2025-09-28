@@ -16,7 +16,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :properties
+      resources :properties do
+        collection do
+          get :count
+        end
+      end
       resources :features, only: [:index, :create]
       resources :localities, only: [:index, :create]
       resources :states, only: [:index, :create]
